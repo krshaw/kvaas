@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 )
 
@@ -26,9 +27,12 @@ func Get(key string) ([]byte, error) {
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		line := scanner.Bytes()
+		fmt.Println(line)
 		// parse json
 		var entry map[string]interface{}
-		json.Unmarshal(line, &entry)
+		if err = json.Unmarshal(line, &entry); err != nil {
+			panic("invalid pair in database")
+		}
 		if val, ok := entry[key]; ok {
 			return json.Marshal(val)
 		}
@@ -57,8 +61,11 @@ func Create(pair []byte) error {
 			keyType = 1
 		}
 	}
-	pair = append(pair, keyType)
-	pair = append(pair, '\n')
+	// + 2 to make room for the type indicator and new line
+	entry := make([]byte, len(pair)+2)
+	entry[0] = keyType
+	entry = append(entry, pair...)
+	entry = append(entry, '\n')
 	if _, err := f.Write(pair); err != nil {
 		return err
 	}
