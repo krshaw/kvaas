@@ -1,0 +1,40 @@
+Create a client that connects to the running DB
+
+The running DB is an API that initially has two functions
+
+Create
+Read
+
+Initially the Create and Read functions will just be a dumb KV store
+
+Create: Takes in a k/v pair, writes it to a file
+Read: Takes in a k, finds it from the file
+
+Create the API so that the underlying implementation of Create and Read can easily change
+The API here is the database CLIENT
+CLIENT calls (create and read) shouldnt change!
+But the underlying DB API can change (and probably will have to)
+
+Create the system with observability in mind
+Want to make changes to the underlying implementation and measure the performance impacts of those changes
+
+Keys can be 64 bit integers, strings
+Values can be 64 bit integers, strings, lists, or objects
+a list can contain integers, strings, or objects
+an object is an unordered set of k/v pairs, where key and value take the same definitions as above
+
+Server:
+~ To start off with, the server will just be http to get a quick prototype
+~ Then change to grpc. Should provide better performance and better API
+~ Possibly create own protocol on top of TCP. Minimal as possible
+
+Perf Improvements:
+Hash Index, B-Tree
+
+For simple perf measurements, I think response time will be ok
+Testing on local machine so delay isn't a major factor
+
+Use flamegraphs to optimize
+
+the handler can just take a json string to start off with
+no input validation (will need that soon to maintain the API contract)
