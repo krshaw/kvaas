@@ -19,7 +19,7 @@ Create the system with observability in mind
 Want to make changes to the underlying implementation and measure the performance impacts of those changes
 
 Keys can be 64 bit integers, strings
-Values can be 64 bit integers, strings, lists, or objects
+Values can be 64 bit integers, strings, lists
 a list can contain integers, strings, or objects
 an object is an unordered set of k/v pairs, where key and value take the same definitions as above
 
@@ -38,3 +38,6 @@ Use flamegraphs to optimize
 
 the handler can just take a json string to start off with
 no input validation (will need that soon to maintain the API contract)
+
+Performance:
+~ Initial version: ~9200 ns/Get, ~7100 ns/Write

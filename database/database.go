@@ -4,13 +4,19 @@ import (
 	"bufio"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"os"
 )
 
-func main() {
-	fmt.Println("vim-go")
-}
+var (
+	// keep seperate indices for different key types
+	StringIndex map[string]int
+	IntIndex    map[int64]int
+
+	indexByType = map[byte]interface{}{
+		0: IntIndex,
+		1: StringIndex,
+	}
+)
 
 func Get(key string) ([]byte, error) {
 	f, err := os.Open("/var/lib/kvaas/data")
@@ -36,11 +42,23 @@ func Create(pair []byte) error {
 		return err
 	}
 	defer f.Close()
-	pair = append(pair, '\n')
 	valid := json.Valid(pair)
 	if !valid {
 		return errors.New("Pair not valid json")
 	}
+	// write type information to the database
+	// figure out if int64 or string
+	var keyType byte = 0
+	if err = json.Unmarshal(pair, &map[int]interface{}{}); err != nil {
+		// try stringEntry instead
+		if err = json.Unmarshal(pair, &map[string]interface{}{}); err != nil {
+			return errors.New("Key not string or integer")
+		} else {
+			keyType = 1
+		}
+	}
+	pair = append(pair, keyType)
+	pair = append(pair, '\n')
 	if _, err := f.Write(pair); err != nil {
 		return err
 	}

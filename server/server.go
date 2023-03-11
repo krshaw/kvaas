@@ -41,7 +41,10 @@ func createHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Writing the k/v pair:\n%s\n", string(body))
 }
 
-func StartServer() {
+func Start() {
+	database.StringIndex = make(map[string]int)
+	database.IntIndex = make(map[int64]int)
+
 	http.HandleFunc("/get", getHandler)
 	http.HandleFunc("/create", createHandler)
 
